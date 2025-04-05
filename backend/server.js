@@ -1,42 +1,58 @@
-const express = require('express');
+const express = require('express'); // Подключение Express
 const knex = require('./database'); // Подключение базы данных
-const cors = require('cors');
+const cors = require('cors'); // Подключение CORS
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Сервер запущен на порту ${PORT}`));
 
-const app = express();
+const app = express(); // Создаем приложение Express
 
-app.use(express.json());
-app.use(cors());
+app.use(express.json()); // Поддержка JSON-запросов
+app.use(cors()); // Включаем CORS для разрешения запросов с других доменов
 
-
-
-
-
-// Получить все задачи
+// Получение всех задач
 app.get('/tasks', async (req, res) => {
-  const tasks = await knex('tasks').select('*');
-  res.json(tasks);
+  try {
+    const tasks = await knex('tasks').select('*');
+    res.json(tasks);
+  } catch (error) {
+    res.status(500).json({ error: 'Не удалось получить задачи' });
+  }
 });
 
-// Добавить новую задачу
+// Добавление новой задачи
 app.post('/tasks', async (req, res) => {
   const { title, deadline } = req.body;
-  const task = await knex('tasks').insert({ title, deadline, completed: false });
-  res.status(201).json({ success: true });
+  try {
+    await knex('tasks').insert({ title, deadline, completed: false });
+    res.status(201).json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Не удалось добавить задачу' });
+  }
 });
 
-// Обновить задачу
+// Обновление задачи
 app.put('/tasks/:id', async (req, res) => {
   const { id } = req.params;
   const { completed } = req.body;
-  await knex('tasks').where({ id }).update({ completed });
-  res.json({ success: true });
+  try {
+    await knex('tasks').where({ id }).update({ completed });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Не удалось обновить задачу' });
+  }
 });
 
-// Удалить задачу
+// Удаление задачи
 app.delete('/tasks/:id', async (req, res) => {
   const { id } = req.params;
-  await knex('tasks').where({ id }).del();
-  res.json({ success: true });
+  try {
+    await knex('tasks').where({ id }).del();
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Не удалось удалить задачу' });
+  }
 });
 
-app.listen(5000, () => console.log('Сервер запущен на http://localhost:5000'));
+// Настройка порта для работы на Render
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Сервер запущен на порту ${PORT}`));
