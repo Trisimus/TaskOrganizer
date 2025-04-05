@@ -1,11 +1,11 @@
 const express = require('express'); // Подключаем Express
-const knex = require('./database'); // Подключаем базу данных
+const knex = require('./database'); // Подключаем knex (настройка базы данных SQLite3)
 const cors = require('cors'); // Разрешаем запросы с других доменов
-
 const app = express(); // Создаем экземпляр приложения Express
 
+// Middleware
 app.use(express.json()); // Поддержка JSON-запросов
-app.use(cors()); // Включаем CORS для клиентской части
+app.use(cors()); // Разрешаем CORS для взаимодействия клиента и сервера
 
 // Получение всех задач
 app.get('/tasks', async (req, res) => {
@@ -66,6 +66,6 @@ app.delete('/tasks/:id', async (req, res) => {
   }
 });
 
-// Настройка порта
-const PORT = process.env.PORT || 5000;
+// Настройка порта для Render
+const PORT = process.env.PORT || 5000; // Render предоставляет порт через переменную окружения
 app.listen(PORT, () => console.log(`✅ Сервер запущен на порту ${PORT}`));
